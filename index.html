@@ -1,0 +1,843 @@
+<title>Kurs Gita: Windows i Mac</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Układ: lepki pasek (system + postęp), z lewej spis lekcji jak oś commitów, z prawej jedna lekcja naraz w kolumnie ~68 znaków. */
+:root{
+  --bg:#F1F4F3; --surface:#FFFFFF; --sunk:#E6EBE9; --ink:#15211E; --muted:#586964; --line:#CFD8D5;
+  --main:#0B7A5F; --main-soft:#D8EFE8; --branch:#2B62D9; --branch-soft:#DEE7FB; --warn:#9A5A08; --warn-soft:#F8EBD3; --bad:#B3261E;
+  --term-bg:#12201D; --term-ink:#DDEBE6; --term-dim:#8FA59E;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",Consolas,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1514; --surface:#172020; --sunk:#1E2A28; --ink:#E3ECE9; --muted:#93A6A0; --line:#2C3B38;
+  --main:#3FCFA6; --main-soft:#143A30; --branch:#86AAFF; --branch-soft:#1B2A4D; --warn:#E5A84C; --warn-soft:#3A2C12; --bad:#FF8A80;
+  --term-bg:#0A100F; --term-ink:#DDEBE6; --term-dim:#7F958E; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0F1514; --surface:#172020; --sunk:#1E2A28; --ink:#E3ECE9; --muted:#93A6A0; --line:#2C3B38;
+  --main:#3FCFA6; --main-soft:#143A30; --branch:#86AAFF; --branch-soft:#1B2A4D; --warn:#E5A84C; --warn-soft:#3A2C12; --bad:#FF8A80;
+  --term-bg:#0A100F; --term-ink:#DDEBE6; --term-dim:#7F958E; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--branch);outline-offset:2px}
+a{color:var(--branch)}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.15rem;letter-spacing:-.01em;margin-right:auto}
+.brand span{color:var(--main)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--sunk)}
+.seg button{border:0;background:transparent;border-radius:999px;padding:4px 14px;cursor:pointer;font-size:.9rem;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.prog{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog-track{width:110px;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
+.prog-fill{height:100%;width:0;background:var(--main);transition:width .3s}
+.menu-btn{display:none;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:.9rem}
+
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:24px 64px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:40px;align-items:start}
+.nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);max-height:calc(100vh - 90px);overflow:auto;padding:2px}
+.nav ol{list-style:none;margin:0;padding:0;position:relative}
+.nav ol::before{content:"";position:absolute;left:9px;top:14px;bottom:14px;width:2px;background:var(--line)}
+.nav button{position:relative;display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:6px 8px 6px 0;cursor:pointer;font-size:.93rem;color:var(--muted);border-radius:6px}
+.nav button::before{content:"";flex:none;width:12px;height:12px;margin-left:4px;border-radius:50%;background:var(--bg);border:2px solid var(--line);position:relative;z-index:1}
+.nav button.done::before{background:var(--main);border-color:var(--main)}
+.nav button[aria-current="true"]{color:var(--ink);font-weight:600}
+.nav button[aria-current="true"]::before{border-color:var(--branch);box-shadow:0 0 0 3px var(--branch-soft)}
+.nav button:hover{color:var(--ink)}
+.reset{margin-top:18px;font-size:.82rem;color:var(--muted)}
+.reset button{border:1px solid var(--line);background:transparent;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:.82rem}
+
+main{min-width:0;max-width:44rem}
+.lesson{display:none;flex-direction:column;gap:18px}
+.lesson.on{display:flex}
+.lesson>*{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--main)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.7rem,4.5vw,2.4rem);line-height:1.12;letter-spacing:-.02em;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:700;font-size:1.25rem;line-height:1.25;margin-top:14px!important;text-wrap:balance}
+.lead{font-size:1.08rem;color:var(--muted)}
+ul,ol.steps{padding-left:1.25rem;display:flex;flex-direction:column;gap:6px}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+
+.cmd{position:relative;background:var(--term-bg);color:var(--term-ink);border-radius:8px;overflow:hidden}
+.cmd pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--f-mono);font-size:.86rem;line-height:1.65}
+.cmd code{background:none;padding:0;font-size:inherit;overflow-wrap:normal}
+.cmd .c{color:var(--term-dim)}
+.cmd-head{display:flex;justify-content:space-between;align-items:center;padding:5px 8px 5px 16px;border-bottom:1px solid #ffffff1c;font-family:var(--f-mono);font-size:.74rem;color:var(--term-dim);letter-spacing:.04em}
+.copy{border:1px solid #ffffff33;background:transparent;color:var(--term-ink);border-radius:5px;padding:1px 9px;font-size:.74rem;cursor:pointer;font-family:var(--f-mono)}
+html[data-os="win"] .os-mac,html[data-os="mac"] .os-win{display:none}
+
+.note{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:0 6px 6px 0;font-size:.95rem}
+.note b{color:var(--warn)}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;font-size:.85rem}
+.flow .box{flex:1 1 120px;min-width:0;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)}
+.flow .box b{display:block;font-family:var(--f-display);font-size:.98rem}
+.flow .box span{color:var(--muted)}
+.flow .arr{flex:0 0 auto;align-self:center;font-family:var(--f-mono);font-size:.74rem;color:var(--main);text-align:center}
+.fig{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:8px}
+.fig svg{display:block;min-width:520px;width:100%;height:auto}
+.fig text{font-family:var(--f-mono);font-size:12px;fill:var(--ink)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td code{white-space:nowrap}
+
+.task{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.task.ok{border-color:var(--main)}
+.task-label{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--branch)}
+.task.ok .task-label{color:var(--main)}
+.task p{margin:0}
+.prompt{display:flex;gap:8px;flex-wrap:wrap}
+.prompt .in{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--term-bg);border-radius:6px;padding:0 12px;font-family:var(--f-mono);color:var(--term-dim)}
+.prompt input{flex:1;min-width:0;border:0;background:transparent;color:var(--term-ink);font-family:var(--f-mono);font-size:.9rem;padding:9px 0;outline:none}
+.prompt .in:focus-within{outline:2px solid var(--branch);outline-offset:2px}
+.btn{border:1px solid var(--main);background:var(--main);color:var(--surface);border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);font-weight:500}
+.fb{font-size:.9rem;min-height:1.3em}
+.fb.good{color:var(--main)} .fb.bad{color:var(--bad)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts button{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:8px 12px;cursor:pointer}
+.opts button.right{border-color:var(--main);background:var(--main-soft)}
+.opts button.wrong{border-color:var(--bad)}
+.check{display:flex;gap:10px;align-items:flex-start}
+.check input{margin-top:.35em;accent-color:var(--main);width:16px;height:16px;flex:none}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:20px!important;padding-top:18px;border-top:1px solid var(--line)}
+
+@media (max-width:820px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:16px}
+  .menu-btn{display:inline-block}
+  .nav{display:none;position:static;max-height:none;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:10px 12px}
+  .nav.open{display:block}
+  .prog-track{width:70px}
+}
+@media (prefers-reduced-motion:reduce){.prog-fill{transition:none}}
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">Kurs <span>Gita</span></div>
+    <div class="seg" role="group" aria-label="Twój system">
+      <button type="button" id="os-win" data-os="win" aria-pressed="true">Windows</button>
+      <button type="button" id="os-mac" data-os="mac" aria-pressed="false">macOS</button>
+    </div>
+    <div class="prog" aria-live="polite"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div><span id="prog-txt">0 / 0</span></div>
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false">Spis lekcji</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="nav" id="nav" aria-label="Lekcje">
+    <ol id="nav-list"></ol>
+    <div class="reset">
+      <button type="button" id="reset-btn">Wyzeruj postęp</button>
+      <span id="reset-confirm" hidden>Na pewno? <button type="button" id="reset-yes">Tak, wyzeruj</button> <button type="button" id="reset-no">Nie</button></span>
+    </div>
+  </nav>
+
+  <main id="main">
+
+<section class="lesson" id="start" data-title="Start">
+  <div class="eyebrow">Zanim zaczniesz</div>
+  <h1>Git od zera, na Windowsie i na Macu</h1>
+  <p class="lead">Git zapamiętuje kolejne wersje Twoich plików. Możesz wrócić do dowolnej z nich, pracować nad kilkoma pomysłami naraz i mieć ten sam projekt na kilku komputerach.</p>
+  <p>Kurs prowadzi od instalacji do swobodnej pracy z GitHubem na dwóch maszynach. Polecenia Gita są takie same w obu systemach. Różni się instalacja, logowanie do GitHuba, schowek i kilka ustawień. W tych miejscach kurs pokazuje wersję dla systemu wybranego w górnym pasku.</p>
+  <h2>Jak korzystać</h2>
+  <ul>
+    <li>Wybierz system u góry. Wybór możesz zmienić w każdej chwili, np. gdy przesiadasz się na drugi komputer.</li>
+    <li>Wpisuj polecenia u siebie w terminalu równolegle z czytaniem. Bez tego niewiele zostaje w głowie.</li>
+    <li>Każda lekcja kończy się zadaniami. W zadaniu „Wpisz polecenie” piszesz komendę tak, jak w terminalu. Kurs ją sprawdza, ale niczego nie uruchamia.</li>
+    <li>Postęp zapisuje się tylko w tej przeglądarce.</li>
+  </ul>
+  <h2>Którego terminala używać</h2>
+  <p class="os-win">Na Windowsie instalator Gita dodaje program <b>Git Bash</b>. Używaj go w tym kursie: działają w nim te same polecenia co na Macu (<code>ls</code>, <code>cat</code>, <code>touch</code>, ścieżki z <code>/</code>). Git działa też w PowerShellu i w terminalu VS Code. Tam, gdzie PowerShell wymaga innej składni, jest to zaznaczone.</p>
+  <p class="os-mac">Na Macu otwórz program <b>Terminal</b> (Spotlight: <code>⌘ Spacja</code>, wpisz „Terminal”). Domyślną powłoką jest zsh i wszystkie polecenia z kursu działają w niej bez zmian.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Co</th><th>Windows (Git Bash)</th><th>macOS (Terminal)</th></tr></thead>
+    <tbody>
+      <tr><td>Folder domowy</td><td><code>/c/Users/imie</code></td><td><code>/Users/imie</code></td></tr>
+      <tr><td>Wklej do terminala</td><td><code>Shift+Insert</code></td><td><code>⌘V</code></td></tr>
+      <tr><td>Przerwij polecenie</td><td><code>Ctrl+C</code></td><td><code>Ctrl+C</code></td></tr>
+      <tr><td>Wyjdź z przeglądania logu</td><td><code>q</code></td><td><code>q</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="lesson" id="instalacja" data-title="Instalacja">
+  <div class="eyebrow">Lekcja 1</div>
+  <h1>Instalacja</h1>
+  <p class="lead">Najpierw sprawdź, czy Git już jest. Jeśli nie, instalacja zajmuje kilka minut.</p>
+  <div class="cmd"><pre><code>git --version</code></pre></div>
+  <p>Jeśli widzisz coś w rodzaju <code>git version 2.4x.x</code>, przejdź do następnej lekcji.</p>
+
+  <div class="os-win">
+    <h2>Windows</h2>
+    <p>Najprościej przez winget, w PowerShellu lub Terminalu Windows:</p>
+    <div class="cmd"><pre><code>winget install --id Git.Git -e --source winget</code></pre></div>
+    <p>Druga droga to instalator ze strony <a href="https://git-scm.com/download/win">git-scm.com</a>. Zadaje dużo pytań. Wartości domyślne są dobre, zwróć uwagę tylko na trzy:</p>
+    <ul>
+      <li><b>Default editor</b>: wybierz edytor, który znasz, np. Visual Studio Code. Domyślny Vim bywa pułapką.</li>
+      <li><b>Initial branch name</b>: zaznacz „Override” i wpisz <code>main</code>.</li>
+      <li><b>Credential helper</b>: zostaw Git Credential Manager. Dzięki niemu logowanie do GitHuba odbywa się w oknie przeglądarki.</li>
+    </ul>
+    <p>Po instalacji zamknij i otwórz terminal na nowo, inaczej polecenie <code>git</code> nie będzie widoczne.</p>
+  </div>
+
+  <div class="os-mac">
+    <h2>macOS</h2>
+    <p>Apple dostarcza Gita w pakiecie narzędzi programisty. To polecenie otwiera okno instalacji:</p>
+    <div class="cmd"><pre><code>xcode-select --install</code></pre></div>
+    <p>Jeśli używasz Homebrew, możesz zainstalować nowszą wersję i od razu narzędzie <code>gh</code>, które przyda się przy logowaniu do GitHuba:</p>
+    <div class="cmd"><pre><code>brew install git gh</code></pre></div>
+    <p>Po instalacji przez Homebrew otwórz nowe okno Terminala i sprawdź <code>which git</code>. Ścieżka <code>/opt/homebrew/bin/git</code> (lub <code>/usr/local/bin/git</code> na Macach z Intelem) oznacza wersję z Homebrew, <code>/usr/bin/git</code> wersję Apple. Obie nadają się do kursu.</p>
+  </div>
+
+  <div class="task" data-kind="cmd" data-ok="^git (--version|version|-v)$" data-ans="git --version">
+    <p>Sprawdź, jaka wersja Gita jest zainstalowana.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="1" data-why="Terminal wczytuje listę programów przy starcie. Nowo zainstalowany Git pojawi się dopiero w nowym oknie.">
+    <p>Po instalacji terminal odpowiada, że nie zna polecenia <code>git</code>. Co zrobić najpierw?</p>
+    <ol><li>Zainstalować Gita jeszcze raz</li><li>Zamknąć terminal i otworzyć go ponownie</li><li>Założyć konto na GitHubie</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="konfiguracja" data-title="Konfiguracja">
+  <div class="eyebrow">Lekcja 2</div>
+  <h1>Konfiguracja</h1>
+  <p class="lead">Git podpisuje każdy zapis Twoim imieniem i adresem e-mail. Ustawiasz to raz na każdym komputerze.</p>
+  <div class="cmd"><pre><code>git config --global user.name "Jan Kowalski"
+git config --global user.email "jan@example.com"
+git config --global init.defaultBranch main</code></pre></div>
+  <p>Podaj ten sam e-mail co na GitHubie, wtedy commity z obu komputerów będą przypisane do Twojego konta. Opcja <code>--global</code> zapisuje ustawienie dla wszystkich repozytoriów na tym komputerze, w pliku <code>~/.gitconfig</code>.</p>
+
+  <h2>Końce linii</h2>
+  <p>Windows kończy wiersz znakami CRLF, Mac i Linux samym LF. Bez ustawienia Git potrafi pokazać cały plik jako zmieniony, choć nikt nie ruszył ani litery. Na każdym systemie ustaw inną wartość:</p>
+  <div class="cmd os-win"><div class="cmd-head"><span>Windows</span></div><pre><code>git config --global core.autocrlf true</code></pre></div>
+  <div class="cmd os-mac"><div class="cmd-head"><span>macOS</span></div><pre><code>git config --global core.autocrlf input</code></pre></div>
+  <p class="os-win"><code>true</code>: w repozytorium trafia LF, a w Twoim folderze pliki mają CRLF.</p>
+  <p class="os-mac"><code>input</code>: pliki zostają z LF, a przypadkowe CRLF Git zamieni przy zapisie do repozytorium.</p>
+  <p>W lekcji o dwóch komputerach dodasz jeszcze plik <code>.gitattributes</code>, który ustala to samo wewnątrz repozytorium, niezależnie od ustawień komputera.</p>
+
+  <h2>Edytor</h2>
+  <p>Git czasem otwiera edytor, np. gdy pominiesz opis commita. Ustaw taki, z którego umiesz wyjść:</p>
+  <div class="cmd"><pre><code>git config --global core.editor "code --wait"</code></pre></div>
+  <p class="os-mac">Polecenie <code>code</code> musi być dostępne w terminalu. W VS Code otwórz paletę (<code>⌘⇧P</code>) i wybierz „Shell Command: Install 'code' command in PATH”.</p>
+
+  <h2>Sprawdzenie</h2>
+  <div class="cmd"><pre><code>git config --global --list</code></pre></div>
+
+  <div class="task" data-kind="cmd" data-ok="^git config --global user\.name &quot;.+&quot;$" data-ans="git config --global user.name &quot;Jan Kowalski&quot;" data-hint="Wartość ze spacją musi być w cudzysłowie.">
+    <p>Ustaw swoje imię i nazwisko dla wszystkich repozytoriów na tym komputerze.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="0" data-why="Na Windowsie true zamienia LF na CRLF przy pobieraniu plików i z powrotem przy zapisie. Na Macu input niczego nie zamienia przy pobieraniu.">
+    <p>Jaką wartość <code>core.autocrlf</code> ustawiasz na Windowsie, a jaką na Macu?</p>
+    <ol><li>Windows: <code>true</code>, Mac: <code>input</code></li><li>Windows: <code>input</code>, Mac: <code>true</code></li><li>Na obu <code>false</code></li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="pierwsze-repo" data-title="Pierwsze repozytorium">
+  <div class="eyebrow">Lekcja 3</div>
+  <h1>Pierwsze repozytorium</h1>
+  <p class="lead">Repozytorium to zwykły folder, w którym Git prowadzi historię. Cała historia leży w ukrytym podfolderze <code>.git</code>.</p>
+  <div class="cmd"><pre><code>mkdir strona
+cd strona
+git init</code></pre></div>
+  <h2>Trzy miejsca</h2>
+  <p>Zmiana przechodzi przez trzy miejsca, zanim trafi do historii. Większość nieporozumień z Gitem bierze się z pomylenia dwóch pierwszych.</p>
+  <div class="flow">
+    <div class="box"><b>Folder roboczy</b><span>pliki, które edytujesz</span></div>
+    <div class="arr">git add<br>→</div>
+    <div class="box"><b>Poczekalnia</b><span>to, co wejdzie do najbliższego commita</span></div>
+    <div class="arr">git commit<br>→</div>
+    <div class="box"><b>Historia</b><span>zapisane commity</span></div>
+  </div>
+  <p>Poczekalnia (ang. <i>staging area</i>) pozwala zapisać tylko część zmian. Poprawiłeś literówkę i jednocześnie zacząłeś nowy formularz? Dodajesz do poczekalni samą literówkę i zapisujesz ją osobno.</p>
+  <h2>Pierwszy commit</h2>
+  <div class="cmd"><pre><code>echo "&lt;h1&gt;Witaj&lt;/h1&gt;" &gt; index.html
+git status                  <span class="c"># index.html jest „untracked”</span>
+git add index.html          <span class="c"># do poczekalni</span>
+git status                  <span class="c"># „Changes to be committed”</span>
+git commit -m "Dodaj stronę główną"</code></pre></div>
+  <p><code>git status</code> jest bezpieczne i nic nie zmienia. Wpisuj je za każdym razem, gdy nie masz pewności, co się dzieje. Podpowiada też kolejne polecenia.</p>
+  <h2>Dobry opis commita</h2>
+  <ul>
+    <li>Mówi, co commit robi: „Dodaj walidację formularza”, nie „zmiany” ani „poprawki 2”.</li>
+    <li>Jeden commit to jedna myśl. Lepiej trzy małe niż jeden na koniec dnia.</li>
+    <li><code>git add .</code> dodaje wszystko z bieżącego folderu. Wygodne, ale przed commitem spójrz w <code>git status</code>, czy nie wpadło coś zbędnego.</li>
+  </ul>
+  <div class="task" data-kind="cmd" data-ok="^git init( \.)?$" data-ans="git init">
+    <p>Jesteś w nowym folderze projektu. Zrób z niego repozytorium.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git add (\.|-A|--all)$" data-ans="git add .">
+    <p>Dodaj do poczekalni wszystkie zmienione i nowe pliki.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git commit -m &quot;.+&quot;$" data-ans="git commit -m &quot;Dodaj stronę główną&quot;" data-hint="Opis podajesz po -m, w cudzysłowie.">
+    <p>Zapisz zawartość poczekalni w historii, z opisem podanym od razu w poleceniu.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="2" data-why="Commit zapisuje stan z poczekalni. Zmiana zrobiona po git add zostaje w folderze roboczym do następnego git add.">
+    <p>Robisz <code>git add index.html</code>, potem dopisujesz w pliku jeszcze jeden wiersz i robisz <code>git commit</code>. Co trafi do commita?</p>
+    <ol><li>Plik z nowym wierszem</li><li>Nic, Git zgłosi błąd</li><li>Plik w wersji z chwili <code>git add</code>, bez nowego wiersza</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="historia" data-title="Historia i różnice">
+  <div class="eyebrow">Lekcja 4</div>
+  <h1>Historia i różnice</h1>
+  <p class="lead">Dwa pytania, które zadajesz Gitowi najczęściej: co już zapisałem i co zmieniłem od tamtej pory.</p>
+  <h2>Historia</h2>
+  <div class="cmd"><pre><code>git log                         <span class="c"># pełne wpisy, wyjście klawiszem q</span>
+git log --oneline               <span class="c"># jeden wiersz na commit</span>
+git log --oneline --graph --all <span class="c"># z rysunkiem gałęzi</span>
+git show a1b2c3d                <span class="c"># co dokładnie zmienił ten commit</span></code></pre></div>
+  <p>Każdy commit ma identyfikator, np. <code>a1b2c3d</code>. To początek długiego skrótu SHA. W poleceniach wystarcza pierwszych 7 znaków.</p>
+  <h2>Różnice</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Polecenie</th><th>Co porównuje</th></tr></thead>
+    <tbody>
+      <tr><td><code>git diff</code></td><td>folder roboczy z poczekalnią: zmiany jeszcze niedodane</td></tr>
+      <tr><td><code>git diff --staged</code></td><td>poczekalnię z ostatnim commitem: to, co zaraz zapiszesz</td></tr>
+      <tr><td><code>git diff main stopka</code></td><td>dwie gałęzie</td></tr>
+    </tbody>
+  </table></div>
+  <p>W wyniku wiersze z <code>-</code> zostały usunięte, a wiersze z <code>+</code> dodane. Zmieniony wiersz pojawia się jako para: stary z minusem, nowy z plusem.</p>
+  <div class="note"><b>Pusty wynik <code>git diff</code></b> po <code>git add</code> jest poprawny. Zmiany są już w poczekalni, więc pokaże je <code>git diff --staged</code>.</div>
+  <div class="task" data-kind="cmd" data-ok="^(?=.*--oneline)git log( --(oneline|graph|all|decorate))+$" data-ans="git log --oneline" data-hint="Szukasz opcji, która skraca wpis do jednego wiersza.">
+    <p>Pokaż historię w zwartej postaci, po jednym wierszu na commit.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git diff --(staged|cached)$" data-ans="git diff --staged">
+    <p>Zrobiłeś <code>git add</code>. Sprawdź przed commitem, co dokładnie jest w poczekalni.</p>
+  </div>
+</section>
+
+<section class="lesson" id="gitignore" data-title="Plik .gitignore">
+  <div class="eyebrow">Lekcja 5</div>
+  <h1>Plik .gitignore</h1>
+  <p class="lead">Nie wszystko powinno trafić do repozytorium. Śmieci systemowe, hasła i pobrane biblioteki zostają poza nim.</p>
+  <p>Utwórz w głównym folderze repozytorium plik <code>.gitignore</code>. Każdy wiersz to wzorzec nazw, które Git ma pomijać:</p>
+  <div class="cmd"><div class="cmd-head"><span>.gitignore</span></div><pre><code><span class="c"># systemowe: wpisz oba, nawet jeśli dziś pracujesz na jednym systemie</span>
+.DS_Store
+Thumbs.db
+desktop.ini
+
+<span class="c"># edytory</span>
+.vscode/
+.idea/
+
+<span class="c"># zależności i wyniki budowania</span>
+node_modules/
+dist/
+
+<span class="c"># dane prywatne</span>
+.env
+*.log</code></pre></div>
+  <p class="os-mac">Na Macu Finder tworzy plik <code>.DS_Store</code> w każdym otwartym folderze. Bez wpisu w <code>.gitignore</code> trafi do repozytorium przy pierwszym <code>git add .</code>.</p>
+  <p class="os-win">Na Windowsie analogiczne są <code>Thumbs.db</code> i <code>desktop.ini</code>. Wpis <code>.DS_Store</code> też zostaw: przyda się, gdy otworzysz projekt na Macu.</p>
+  <h2>Globalna lista dla całego komputera</h2>
+  <p>Pliki systemowe możesz wykluczyć raz, dla wszystkich repozytoriów:</p>
+  <div class="cmd os-win"><div class="cmd-head"><span>Windows (Git Bash)</span></div><pre><code>printf "Thumbs.db\ndesktop.ini\n" &gt;&gt; ~/.gitignore_global
+git config --global core.excludesFile ~/.gitignore_global</code></pre></div>
+  <div class="cmd os-mac"><div class="cmd-head"><span>macOS</span></div><pre><code>echo ".DS_Store" &gt;&gt; ~/.gitignore_global
+git config --global core.excludesFile ~/.gitignore_global</code></pre></div>
+  <h2>Plik już jest w repozytorium</h2>
+  <p><code>.gitignore</code> działa tylko na pliki, których Git jeszcze nie śledzi. Jeśli plik został wcześniej zapisany w commicie, trzeba go wyjąć ze śledzenia. Na dysku zostaje:</p>
+  <div class="cmd"><pre><code>git rm --cached .env
+git commit -m "Przestań śledzić .env"</code></pre></div>
+  <div class="note"><b>Hasło w historii zostaje w historii.</b> <code>git rm --cached</code> usuwa plik z kolejnych commitów, ale stare nadal go zawierają. Hasło lub klucz, który trafił na GitHuba, trzeba zmienić.</div>
+  <div class="task" data-kind="cmd" data-ok="^git rm --cached (-r )?config\.local\.php$" data-ans="git rm --cached config.local.php" data-hint="Plik ma zostać na dysku, więc potrzebna jest opcja --cached.">
+    <p>Plik <code>config.local.php</code> trafił kiedyś do repozytorium. Dopisałeś go do <code>.gitignore</code>, ale Git dalej pokazuje jego zmiany. Wyjmij go ze śledzenia, nie kasując z dysku.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="1" data-why="Ukośnik na końcu oznacza folder. Wzorzec bez ścieżki pasuje na każdym poziomie repozytorium.">
+    <p>Co pomija wiersz <code>node_modules/</code>?</p>
+    <ol><li>Tylko plik o nazwie node_modules</li><li>Każdy folder node_modules wraz z zawartością</li><li>Wszystkie pliki z rozszerzeniem .modules</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="galezie" data-title="Gałęzie">
+  <div class="eyebrow">Lekcja 6</div>
+  <h1>Gałęzie</h1>
+  <p class="lead">Gałąź to osobna linia pracy. Zaczynasz na niej coś nowego, a <code>main</code> przez ten czas zostaje w działającym stanie.</p>
+  <div class="fig"><svg viewBox="0 0 640 170" role="img" aria-label="Gałąź stopka odchodzi od main po drugim commicie, ma dwa commity i wraca do main w commicie scalającym">
+    <line x1="60" y1="55" x2="560" y2="55" stroke="var(--main)" stroke-width="3" fill="none"/>
+    <path d="M190 55 C240 55 250 120 310 120 L430 120 C490 120 500 55 560 55" stroke="var(--branch)" stroke-width="3" fill="none"/>
+    <circle cx="60" cy="55" r="9" fill="var(--main)"/><circle cx="190" cy="55" r="9" fill="var(--main)"/>
+    <circle cx="375" cy="55" r="9" fill="var(--main)"/><circle cx="560" cy="55" r="9" fill="var(--surface)" stroke="var(--main)" stroke-width="3"/>
+    <circle cx="310" cy="120" r="9" fill="var(--branch)"/><circle cx="430" cy="120" r="9" fill="var(--branch)"/>
+    <text x="60" y="30" text-anchor="middle">main</text>
+    <text x="190" y="30" text-anchor="middle">switch -c stopka</text>
+    <text x="560" y="30" text-anchor="middle">merge stopka</text>
+    <text x="370" y="152" text-anchor="middle">stopka</text>
+  </svg></div>
+  <h2>Praca na gałęzi</h2>
+  <div class="cmd"><pre><code>git switch -c stopka        <span class="c"># utwórz gałąź i przejdź na nią</span>
+<span class="c"># ...edytujesz, git add, git commit, ile razy trzeba...</span>
+git switch main             <span class="c"># wróć na main</span>
+git merge stopka            <span class="c"># dołącz zmiany ze stopki</span>
+git branch -d stopka        <span class="c"># gałąź zrobiła swoje</span></code></pre></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Polecenie</th><th>Działanie</th></tr></thead>
+    <tbody>
+      <tr><td><code>git branch</code></td><td>lista gałęzi, bieżąca ma gwiazdkę</td></tr>
+      <tr><td><code>git switch nazwa</code></td><td>przejście na istniejącą gałąź</td></tr>
+      <tr><td><code>git switch -c nazwa</code></td><td>nowa gałąź i przejście na nią</td></tr>
+      <tr><td><code>git switch -</code></td><td>powrót na poprzednią gałąź</td></tr>
+      <tr><td><code>git branch -d nazwa</code></td><td>usunięcie scalonej gałęzi</td></tr>
+    </tbody>
+  </table></div>
+  <p>W starszych poradnikach zobaczysz <code>git checkout nazwa</code> i <code>git checkout -b nazwa</code>. Robią to samo. <code>switch</code> jest nowszy i służy tylko do gałęzi, więc trudniej nim coś zepsuć.</p>
+  <h2>Dwa rodzaje scalenia</h2>
+  <ul>
+    <li><b>Fast-forward</b>: na <code>main</code> nic się nie zmieniło od odejścia gałęzi. Git przesuwa <code>main</code> do przodu i nie tworzy dodatkowego commita.</li>
+    <li><b>Commit scalający</b>: obie gałęzie mają nowe commity. Git łączy je i zapisuje commit z dwoma rodzicami, jak na rysunku.</li>
+  </ul>
+  <div class="note"><b>Przed zmianą gałęzi zrób commit</b> albo odłóż zmiany poleceniem <code>git stash</code> (lekcja 9). Niezapisane zmiany przechodzą na drugą gałąź razem z Tobą albo blokują przejście.</div>
+  <div class="task" data-kind="cmd" data-ok="^git (switch -c|checkout -b) stopka$" data-ans="git switch -c stopka">
+    <p>Utwórz gałąź <code>stopka</code> i od razu na nią przejdź.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git merge stopka$" data-ans="git merge stopka" data-hint="Scalasz zawsze do gałęzi, na której stoisz.">
+    <p>Stoisz na <code>main</code>. Dołącz do niej pracę z gałęzi <code>stopka</code>.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="0" data-why="Scalenie wciąga wskazaną gałąź do bieżącej. Dlatego najpierw git switch main, potem git merge stopka.">
+    <p>Chcesz, żeby zmiany ze <code>stopka</code> znalazły się na <code>main</code>. Na której gałęzi musisz stać, wpisując <code>git merge</code>?</p>
+    <ol><li>Na <code>main</code></li><li>Na <code>stopka</code></li><li>Nie ma znaczenia</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="konflikty" data-title="Konflikty">
+  <div class="eyebrow">Lekcja 7</div>
+  <h1>Konflikty</h1>
+  <p class="lead">Konflikt powstaje, gdy dwie gałęzie zmieniły ten sam fragment tego samego pliku. Git nie zgaduje, która wersja jest właściwa, tylko pyta Ciebie.</p>
+  <p>Po nieudanym <code>git merge</code> (albo <code>git pull</code>) plik wygląda tak:</p>
+  <div class="cmd"><div class="cmd-head"><span>index.html</span></div><pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+&lt;h1&gt;Sklep rowerowy&lt;/h1&gt;
+=======
+&lt;h1&gt;Serwis i sklep rowerowy&lt;/h1&gt;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; stopka</code></pre></div>
+  <ul>
+    <li>Od <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> do <code>=======</code>: wersja z gałęzi, na której stoisz.</li>
+    <li>Od <code>=======</code> do <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>: wersja z gałęzi, którą dołączasz.</li>
+  </ul>
+  <h2>Rozwiązanie krok po kroku</h2>
+  <ol class="steps">
+    <li><code>git status</code> pokaże pliki oznaczone „both modified”.</li>
+    <li>Otwórz każdy z nich. Zostaw to, co ma być w pliku: jedną wersję, drugą albo połączenie obu. Usuń trzy wiersze ze znacznikami.</li>
+    <li><code>git add index.html</code> oznacza konflikt jako rozwiązany.</li>
+    <li><code>git commit</code> kończy scalenie. Git sam proponuje opis.</li>
+  </ol>
+  <p>VS Code pokazuje nad konfliktem przyciski „Accept Current Change”, „Accept Incoming Change” i „Accept Both Changes”. Robią dokładnie to, co ręczna edycja.</p>
+  <div class="cmd"><pre><code>git merge --abort           <span class="c"># wycofaj się, stan jak przed scaleniem</span></code></pre></div>
+  <div class="note"><b>Jak mieć mniej konfliktów:</b> pobieraj zmiany przed rozpoczęciem pracy, rób małe commity i nie trzymaj gałęzi tygodniami bez scalania.</div>
+  <div class="task" data-kind="cmd" data-ok="^git merge --abort$" data-ans="git merge --abort">
+    <p>Scalenie skończyło się konfliktami w pięciu plikach, a Ty nie masz teraz na to czasu. Wróć do stanu sprzed scalenia.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="2" data-why="git add mówi Gitowi, że plik jest już w docelowej postaci. Dopiero potem commit kończy scalenie.">
+    <p>Poprawiłeś plik i usunąłeś znaczniki konfliktu. Co teraz?</p>
+    <ol><li>Od razu <code>git commit</code></li><li>Jeszcze raz <code>git merge stopka</code></li><li><code>git add</code> tego pliku, potem <code>git commit</code></li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="github" data-title="GitHub i zdalne repozytoria">
+  <div class="eyebrow">Lekcja 8</div>
+  <h1>GitHub i zdalne repozytoria</h1>
+  <p class="lead">Do tej pory wszystko działo się na Twoim dysku. Zdalne repozytorium to kopia na serwerze: zapas na wypadek awarii i miejsce, przez które wymieniasz się zmianami z drugim komputerem.</p>
+  <div class="flow">
+    <div class="box"><b>Twój komputer</b><span>folder roboczy i lokalna historia</span></div>
+    <div class="arr">git push →<br>← git pull</div>
+    <div class="box"><b>GitHub (origin)</b><span>zdalna kopia historii</span></div>
+  </div>
+  <h2>Logowanie</h2>
+  <p>GitHub nie przyjmuje hasła do konta w terminalu. Są dwie drogi: HTTPS z logowaniem przez przeglądarkę albo klucz SSH. Na początek wygodniejszy jest HTTPS.</p>
+  <div class="os-win">
+    <p><b>Windows, HTTPS:</b> nic nie konfigurujesz. Przy pierwszym <code>git push</code> lub <code>git clone</code> prywatnego repozytorium Git Credential Manager otworzy okno logowania do GitHuba i zapamięta dostęp w Menedżerze poświadczeń Windows.</p>
+  </div>
+  <div class="os-mac">
+    <p><b>macOS, HTTPS:</b> najprościej przez narzędzie <code>gh</code>. Wybierz kolejno GitHub.com, HTTPS i logowanie przez przeglądarkę:</p>
+    <div class="cmd"><pre><code>brew install gh
+gh auth login</code></pre></div>
+    <p>Dostęp trafia do Pęku kluczy i Git korzysta z niego sam.</p>
+  </div>
+  <h2>Klucz SSH (druga droga)</h2>
+  <p>Klucz generujesz osobno na każdym komputerze. Każdy komputer ma własny, a na GitHubie dodajesz oba.</p>
+  <div class="cmd"><pre><code>ssh-keygen -t ed25519 -C "jan@example.com"</code></pre></div>
+  <p>Zatwierdź domyślną lokalizację Enterem. Potem skopiuj <b>publiczną</b> część klucza (plik z końcówką <code>.pub</code>):</p>
+  <div class="cmd os-win"><div class="cmd-head"><span>Windows (Git Bash)</span></div><pre><code>clip &lt; ~/.ssh/id_ed25519.pub</code></pre></div>
+  <p class="os-win">W PowerShellu: <code>Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub | Set-Clipboard</code></p>
+  <div class="cmd os-mac"><div class="cmd-head"><span>macOS</span></div><pre><code>pbcopy &lt; ~/.ssh/id_ed25519.pub
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519   <span class="c"># hasło klucza do Pęku kluczy</span></code></pre></div>
+  <p>Na GitHubie wejdź w Settings → SSH and GPG keys → New SSH key, wklej klucz i nazwij go od komputera, np. „Laptop Windows”. Sprawdzenie:</p>
+  <div class="cmd"><pre><code>ssh -T git@github.com       <span class="c"># „Hi login! You've successfully authenticated”</span></code></pre></div>
+  <div class="note"><b>Pliku bez <code>.pub</code> nikomu nie pokazuj.</b> To klucz prywatny. Na GitHuba trafia wyłącznie zawartość pliku <code>id_ed25519.pub</code>.</div>
+
+  <h2>Wysłanie istniejącego repozytorium</h2>
+  <p>Na GitHubie utwórz puste repozytorium (bez README i bez .gitignore). Potem w swoim folderze:</p>
+  <div class="cmd"><pre><code>git remote add origin https://github.com/login/strona.git
+git push -u origin main</code></pre></div>
+  <p><code>origin</code> to umowna nazwa zdalnego repozytorium. <code>-u</code> łączy lokalną gałąź <code>main</code> ze zdalną, więc następnym razem wystarczy samo <code>git push</code> i <code>git pull</code>. Przy SSH adres ma postać <code>git@github.com:login/strona.git</code>.</p>
+  <h2>Pobranie repozytorium na drugi komputer</h2>
+  <div class="cmd"><pre><code>git clone https://github.com/login/strona.git
+cd strona</code></pre></div>
+  <p><code>clone</code> tworzy folder, pobiera całą historię i sam ustawia <code>origin</code>.</p>
+  <h2>Codzienna wymiana</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Polecenie</th><th>Działanie</th></tr></thead>
+    <tbody>
+      <tr><td><code>git push</code></td><td>wysyła Twoje nowe commity na serwer</td></tr>
+      <tr><td><code>git fetch</code></td><td>pobiera nowości z serwera, ale nie zmienia Twoich plików</td></tr>
+      <tr><td><code>git pull</code></td><td><code>fetch</code> i od razu scalenie z Twoją gałęzią</td></tr>
+      <tr><td><code>git remote -v</code></td><td>pokazuje adresy zdalnych repozytoriów</td></tr>
+    </tbody>
+  </table></div>
+  <div class="task" data-kind="cmd" data-ok="^git push (-u|--set-upstream) origin main$" data-ans="git push -u origin main" data-hint="Podaj nazwę zdalnego repozytorium, gałąź i opcję, która je ze sobą łączy.">
+    <p>Dodałeś <code>origin</code>. Wyślij gałąź <code>main</code> pierwszy raz tak, żeby później wystarczało samo <code>git push</code>.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git clone (https://github\.com/|git@github\.com:)jan/strona(\.git)?$" data-ans="git clone https://github.com/jan/strona.git">
+    <p>Pobierz na ten komputer repozytorium <code>strona</code> użytkownika <code>jan</code> z GitHuba.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="1" data-why="fetch tylko aktualizuje wiedzę o serwerze. Twoje pliki i gałąź zmienia dopiero merge albo pull.">
+    <p>Czym różni się <code>git fetch</code> od <code>git pull</code>?</p>
+    <ol><li>Niczym, to dwie nazwy tego samego</li><li><code>fetch</code> tylko pobiera, <code>pull</code> pobiera i scala z Twoją gałęzią</li><li><code>fetch</code> wysyła zmiany, <code>pull</code> je pobiera</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="dwa-komputery" data-title="Windows i Mac naraz">
+  <div class="eyebrow">Lekcja 9</div>
+  <h1>Jedno repozytorium, Windows i Mac</h1>
+  <p class="lead">Praca na dwóch systemach wymaga jednego nawyku i trzech ustawień. Nawyk jest ważniejszy.</p>
+  <h2>Rytm pracy</h2>
+  <ol class="steps">
+    <li>Siadasz do komputera: <code>git pull</code>.</li>
+    <li>Pracujesz i robisz commity.</li>
+    <li>Wstajesz od komputera: <code>git push</code>.</li>
+  </ol>
+  <p>Jeśli zapomnisz o <code>push</code> na jednym komputerze i zrobisz commity na drugim, historie się rozejdą. Nic nie ginie, a <code>git pull</code> je scali, czasem z konfliktem. Czystszą historię daje:</p>
+  <div class="cmd"><pre><code>git pull --rebase           <span class="c"># Twoje lokalne commity lądują po tych z serwera</span></code></pre></div>
+  <h2>Niedokończona praca: stash</h2>
+  <p><code>git pull</code> odmówi, gdy masz niezapisane zmiany w plikach, które przyszły z serwera. Odłóż je na bok, pobierz nowości i przywróć:</p>
+  <div class="cmd"><pre><code>git stash                   <span class="c"># schowaj niezapisane zmiany</span>
+git pull
+git stash pop               <span class="c"># przywróć je</span></code></pre></div>
+  <p>Stash zostaje na tym jednym komputerze. Żeby przenieść niedokończoną pracę na drugi, zrób commit na osobnej gałęzi i wypchnij ją.</p>
+
+  <h2>Ustawienie 1: końce linii w repozytorium</h2>
+  <p>Dodaj do głównego folderu plik <code>.gitattributes</code>. Działa na każdym komputerze, także tam, gdzie ktoś pominął <code>core.autocrlf</code>:</p>
+  <div class="cmd"><div class="cmd-head"><span>.gitattributes</span></div><pre><code>* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.pdf binary
+*.bat text eol=crlf
+*.ps1 text eol=crlf</code></pre></div>
+  <p>Pierwszy wiersz każe trzymać pliki tekstowe z LF, w repozytorium i na dysku. Współczesne edytory na Windowsie radzą sobie z tym bez problemu. Skrypty <code>.bat</code> i <code>.ps1</code> zostają przy CRLF. Jeśli dodajesz ten plik do istniejącego projektu, wyrównaj stare pliki jednym commitem:</p>
+  <div class="cmd"><pre><code>git add --renormalize .
+git commit -m "Ujednolić końce linii"</code></pre></div>
+
+  <h2>Ustawienie 2: wielkość liter w nazwach</h2>
+  <p>Dyski Windowsa i Maca domyślnie nie rozróżniają <code>Logo.png</code> od <code>logo.png</code>. Serwer z Linuksem rozróżnia, więc strona działająca u Ciebie może po wgraniu zgubić obrazek. Zmiana samej wielkości liter w Eksploratorze lub Finderze bywa dla Gita niewidoczna. Rób ją przez Gita:</p>
+  <div class="cmd"><pre><code>git mv Logo.png logo.png</code></pre></div>
+  <p>Najprostsza zasada: nazwy plików małymi literami, bez spacji i polskich znaków.</p>
+
+  <h2>Ustawienie 3: pliki wykonywalne</h2>
+  <p>Mac zapisuje, czy plik wolno uruchomić. Windows nie ma takiej informacji. Jeśli w repozytorium jest skrypt powłoki, ustaw to przez Gita. Działa na obu systemach:</p>
+  <div class="cmd"><pre><code>git update-index --chmod=+x buduj.sh</code></pre></div>
+  <p class="os-mac">Jeśli <code>git status</code> na Macu pokazuje pliki jako zmienione, a <code>git diff</code> wypisuje tylko „old mode / new mode”, to właśnie ta różnica.</p>
+  <p class="os-win">Git na Windowsie pomija te uprawnienia (<code>core.fileMode false</code>), więc u Ciebie problem się nie pojawi. Zobaczysz go dopiero na Macu.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Objaw</th><th>Przyczyna</th><th>Rozwiązanie</th></tr></thead>
+    <tbody>
+      <tr><td>Cały plik oznaczony jako zmieniony</td><td>końce linii</td><td><code>.gitattributes</code> i <code>--renormalize</code></td></tr>
+      <tr><td>W repozytorium jest <code>.DS_Store</code></td><td>Finder</td><td><code>.gitignore</code>, potem <code>git rm --cached</code></td></tr>
+      <tr><td>Obrazek działa lokalnie, na serwerze nie</td><td>wielkość liter</td><td><code>git mv</code></td></tr>
+      <tr><td><code>push</code> odrzucony („rejected”)</td><td>na serwerze są nowsze commity</td><td><code>git pull --rebase</code>, potem <code>git push</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="task" data-kind="cmd" data-ok="^git stash( push)?( (-u|--include-untracked))?$" data-ans="git stash">
+    <p>Masz niedokończone zmiany, a musisz zrobić <code>git pull</code>. Odłóż zmiany na bok.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git pull --rebase( origin main)?$" data-ans="git pull --rebase">
+    <p><code>git push</code> został odrzucony, bo drugi komputer wysłał wcześniej swoje commity. Pobierz je tak, żeby Twoje commity znalazły się po nich, bez commita scalającego.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="2" data-why="Plik .gitattributes jest częścią repozytorium, więc obowiązuje na każdym komputerze po git pull. Ustawienia z git config zostają lokalne.">
+    <p>Dlaczego <code>.gitattributes</code> jest pewniejszy niż samo <code>core.autocrlf</code>?</p>
+    <ol><li>Bo działa szybciej</li><li>Bo zmienia końce linii także w plikach binarnych</li><li>Bo podróżuje razem z repozytorium i nie zależy od ustawień komputera</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="cofanie" data-title="Cofanie zmian">
+  <div class="eyebrow">Lekcja 10</div>
+  <h1>Cofanie zmian</h1>
+  <p class="lead">Właściwe polecenie zależy od tego, dokąd zmiana już dotarła: do pliku, do poczekalni, do commita czy na serwer.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Sytuacja</th><th>Polecenie</th></tr></thead>
+    <tbody>
+      <tr><td>Zepsułem plik, chcę wersję z ostatniego commita</td><td><code>git restore index.html</code></td></tr>
+      <tr><td>Dodałem plik do poczekalni przez pomyłkę</td><td><code>git restore --staged index.html</code></td></tr>
+      <tr><td>Literówka w opisie ostatniego commita</td><td><code>git commit --amend -m "Nowy opis"</code></td></tr>
+      <tr><td>Zapomniałem pliku w ostatnim commicie</td><td><code>git add plik</code>, potem <code>git commit --amend --no-edit</code></td></tr>
+      <tr><td>Ostatni commit był przedwczesny, zmiany chcę zachować</td><td><code>git reset --soft HEAD~1</code></td></tr>
+      <tr><td>Commit jest już na serwerze i trzeba go odwrócić</td><td><code>git revert a1b2c3d</code></td></tr>
+    </tbody>
+  </table></div>
+  <h2>revert czy reset</h2>
+  <ul>
+    <li><code>git revert</code> dodaje nowy commit, który odwraca zmiany wskazanego. Historia zostaje nietknięta, więc jest bezpieczny dla commitów już wypchniętych.</li>
+    <li><code>git reset</code> przesuwa gałąź wstecz, czyli usuwa commity z historii. Używaj tylko dla commitów, których jeszcze nie wysłałeś.</li>
+  </ul>
+  <div class="note"><b>Dwa polecenia kasują pracę bez pytania:</b> <code>git restore plik</code> nadpisuje niezapisane zmiany w pliku, a <code>git reset --hard</code> kasuje wszystkie niezapisane zmiany w repozytorium. Zmian, których nie było w żadnym commicie, Git nie odzyska.</div>
+  <h2>Koło ratunkowe: reflog</h2>
+  <p>Git przez kilka tygodni pamięta każde położenie, w którym była Twoja gałąź, także po <code>reset</code>. Commit, który „zniknął”, zwykle da się odnaleźć:</p>
+  <div class="cmd"><pre><code>git reflog                  <span class="c"># lista ostatnich położeń z identyfikatorami</span>
+git switch -c ratunek a1b2c3d   <span class="c"># nowa gałąź w odnalezionym miejscu</span></code></pre></div>
+  <p>Reflog jest lokalny. Na drugim komputerze go nie ma.</p>
+  <div class="task" data-kind="cmd" data-ok="^git restore --staged index\.html$|^git reset (HEAD )?(-- )?index\.html$" data-ans="git restore --staged index.html">
+    <p>Plik <code>index.html</code> trafił do poczekalni za wcześnie. Wyjmij go stamtąd, zostawiając zmiany w pliku.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git revert a1b2c3d$" data-ans="git revert a1b2c3d" data-hint="Commit jest już na serwerze, więc historii nie wolno przepisywać.">
+    <p>Commit <code>a1b2c3d</code> jest na GitHubie i psuje stronę. Odwróć jego zmiany bezpiecznie.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="0" data-why="amend tworzy nowy commit w miejsce starego. Jeśli stary jest już na serwerze, historie się rozjadą i push zostanie odrzucony.">
+    <p>Kiedy <code>git commit --amend</code> jest złym pomysłem?</p>
+    <ol><li>Gdy commit został już wypchnięty na serwer</li><li>Gdy commit ma mniej niż godzinę</li><li>Gdy zmieniasz tylko opis</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="projekt" data-title="Projekt końcowy">
+  <div class="eyebrow">Praktyka</div>
+  <h1>Projekt końcowy</h1>
+  <p class="lead">Przejdź całą ścieżkę na prawdziwym repozytorium. Jeśli masz dwa komputery, kroki 8–10 zrób na drugim.</p>
+  <div class="task" data-kind="check">
+    <label class="check"><input type="checkbox"><span>Utwórz folder <code>wizytowka</code>, zrób w nim <code>git init</code> i sprawdź <code>git status</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Dodaj <code>index.html</code> i <code>.gitignore</code> z wpisami <code>.DS_Store</code> oraz <code>Thumbs.db</code>. Zrób pierwszy commit.</span></label>
+    <label class="check"><input type="checkbox"><span>Dodaj <code>.gitattributes</code> z wierszem <code>* text=auto eol=lf</code> i zapisz go osobnym commitem.</span></label>
+    <label class="check"><input type="checkbox"><span>Na gałęzi <code>kontakt</code> dopisz sekcję kontaktową w dwóch commitach.</span></label>
+    <label class="check"><input type="checkbox"><span>Wróć na <code>main</code>, zmień tam nagłówek strony i zrób commit.</span></label>
+    <label class="check"><input type="checkbox"><span>Scal <code>kontakt</code> do <code>main</code>. Obejrzyj wynik w <code>git log --oneline --graph</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Utwórz puste repozytorium na GitHubie, dodaj <code>origin</code> i zrób <code>git push -u origin main</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>Na drugim komputerze (albo w innym folderze) zrób <code>git clone</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>W klonie zmień coś, zrób commit i <code>git push</code>.</span></label>
+    <label class="check"><input type="checkbox"><span>W pierwszym folderze zrób <code>git pull</code> i sprawdź, że zmiana dotarła.</span></label>
+    <label class="check"><input type="checkbox"><span>Wywołaj konflikt celowo: zmień ten sam wiersz w obu kopiach, wypchnij jedną, zrób <code>pull</code> w drugiej i rozwiąż konflikt.</span></label>
+    <label class="check"><input type="checkbox"><span>Odwróć jeden z commitów poleceniem <code>git revert</code> i wypchnij wynik.</span></label>
+  </div>
+</section>
+
+<section class="lesson" id="sciaga" data-title="Ściąga">
+  <div class="eyebrow">Pod ręką</div>
+  <h1>Ściąga</h1>
+  <p class="lead">Wszystkie polecenia z kursu w jednym miejscu.</p>
+  <h2>Codziennie</h2>
+  <div class="tbl"><table><tbody>
+    <tr><td><code>git status</code></td><td>co się zmieniło i co jest w poczekalni</td></tr>
+    <tr><td><code>git add plik</code> / <code>git add .</code></td><td>do poczekalni</td></tr>
+    <tr><td><code>git commit -m "Opis"</code></td><td>zapis do historii</td></tr>
+    <tr><td><code>git pull</code></td><td>pobierz i scal zmiany z serwera</td></tr>
+    <tr><td><code>git push</code></td><td>wyślij commity na serwer</td></tr>
+    <tr><td><code>git log --oneline --graph --all</code></td><td>historia z gałęziami</td></tr>
+    <tr><td><code>git diff</code> / <code>git diff --staged</code></td><td>zmiany niedodane / dodane</td></tr>
+  </tbody></table></div>
+  <h2>Gałęzie</h2>
+  <div class="tbl"><table><tbody>
+    <tr><td><code>git switch -c nazwa</code></td><td>nowa gałąź</td></tr>
+    <tr><td><code>git switch nazwa</code></td><td>przejście na gałąź</td></tr>
+    <tr><td><code>git merge nazwa</code></td><td>dołącz gałąź do bieżącej</td></tr>
+    <tr><td><code>git merge --abort</code></td><td>przerwij scalanie z konfliktem</td></tr>
+    <tr><td><code>git branch -d nazwa</code></td><td>usuń scaloną gałąź</td></tr>
+    <tr><td><code>git push -u origin nazwa</code></td><td>wyślij gałąź na serwer pierwszy raz</td></tr>
+  </tbody></table></div>
+  <h2>Cofanie</h2>
+  <div class="tbl"><table><tbody>
+    <tr><td><code>git restore plik</code></td><td>odrzuć niezapisane zmiany w pliku</td></tr>
+    <tr><td><code>git restore --staged plik</code></td><td>wyjmij z poczekalni</td></tr>
+    <tr><td><code>git commit --amend</code></td><td>popraw ostatni, niewysłany commit</td></tr>
+    <tr><td><code>git revert id</code></td><td>odwróć commit nowym commitem</td></tr>
+    <tr><td><code>git reset --soft HEAD~1</code></td><td>cofnij ostatni commit, zachowaj zmiany</td></tr>
+    <tr><td><code>git stash</code> / <code>git stash pop</code></td><td>odłóż zmiany / przywróć</td></tr>
+    <tr><td><code>git reflog</code></td><td>historia położeń gałęzi</td></tr>
+  </tbody></table></div>
+  <h2>Różnice między systemami</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Co</th><th>Windows</th><th>macOS</th></tr></thead>
+    <tbody>
+      <tr><td>Instalacja</td><td><code>winget install --id Git.Git -e</code></td><td><code>xcode-select --install</code></td></tr>
+      <tr><td>Terminal</td><td>Git Bash</td><td>Terminal (zsh)</td></tr>
+      <tr><td><code>core.autocrlf</code></td><td><code>true</code></td><td><code>input</code></td></tr>
+      <tr><td>Logowanie HTTPS</td><td>Git Credential Manager</td><td><code>gh auth login</code></td></tr>
+      <tr><td>Klucz do schowka</td><td><code>clip &lt; ~/.ssh/id_ed25519.pub</code></td><td><code>pbcopy &lt; ~/.ssh/id_ed25519.pub</code></td></tr>
+      <tr><td>Pliki do ignorowania</td><td><code>Thumbs.db</code>, <code>desktop.ini</code></td><td><code>.DS_Store</code></td></tr>
+      <tr><td>Plik ustawień</td><td><code>C:\Users\imie\.gitconfig</code></td><td><code>/Users/imie/.gitconfig</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+    <div class="pager">
+      <button type="button" class="btn ghost" id="prev">← Wstecz</button>
+      <button type="button" class="btn" id="next">Dalej →</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var KEY = 'kursgit';
+  var state = { os: /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? 'mac' : 'win', done: {} };
+  try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.done) state = s; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var root = document.documentElement;
+  var lessons = [].slice.call(document.querySelectorAll('.lesson'));
+  var navList = document.getElementById('nav-list');
+  var nav = document.getElementById('nav');
+  var menuBtn = document.getElementById('menu-btn');
+  var tasks = [];
+  var current = 0;
+
+  function setOs(os) {
+    state.os = os; root.setAttribute('data-os', os);
+    document.getElementById('os-win').setAttribute('aria-pressed', os === 'win');
+    document.getElementById('os-mac').setAttribute('aria-pressed', os === 'mac');
+    save();
+  }
+  document.getElementById('os-win').onclick = function () { setOs('win'); };
+  document.getElementById('os-mac').onclick = function () { setOs('mac'); };
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function norm(v) {
+    return v.trim().replace(/^\$\s*/, '').replace(/\s+/g, ' ').replace(/[\u2018\u2019']/g, '"').replace(/[\u201C\u201D\u201E]/g, '"');
+  }
+
+  function markDone(t, silent) {
+    t.node.classList.add('ok');
+    t.label.textContent = t.name + ' · zaliczone';
+    if (!silent) { state.done[t.id] = true; save(); refresh(); }
+  }
+
+  function buildCmd(t) {
+    var n = t.node;
+    var row = el('div', 'prompt'), box = el('div', 'in'), input = el('input');
+    input.id = 'in-' + t.id; input.type = 'text'; input.autocomplete = 'off'; input.spellcheck = false;
+    input.setAttribute('autocapitalize', 'off'); input.setAttribute('aria-label', 'Polecenie');
+    box.appendChild(el('span', null, '$')); box.appendChild(input);
+    var check = el('button', 'btn', 'Sprawdź'); check.type = 'button';
+    var show = el('button', 'btn ghost', 'Pokaż odpowiedź'); show.type = 'button';
+    var fb = el('div', 'fb');
+    row.appendChild(box); row.appendChild(check); row.appendChild(show);
+    n.appendChild(row); n.appendChild(fb);
+    var re = new RegExp(n.getAttribute('data-ok')), tries = 0;
+    function run() {
+      var v = norm(input.value);
+      if (!v) { fb.className = 'fb bad'; fb.textContent = 'Wpisz polecenie.'; return; }
+      if (re.test(v)) { fb.className = 'fb good'; fb.textContent = 'Dobrze.'; markDone(t); return; }
+      tries++;
+      var hint = n.getAttribute('data-hint');
+      fb.className = 'fb bad';
+      fb.textContent = !/^git /.test(v) ? 'Polecenie powinno zaczynać się od „git ”.' : (hint && tries > 1 ? 'Jeszcze nie. ' + hint : 'Jeszcze nie. Spróbuj ponownie.');
+    }
+    check.onclick = run;
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') run(); });
+    show.onclick = function () { fb.className = 'fb'; fb.textContent = 'Odpowiedź: ' + n.getAttribute('data-ans'); };
+    t.reset = function () { input.value = ''; fb.textContent = ''; };
+  }
+
+  function buildQuiz(t) {
+    var n = t.node, ol = n.querySelector('ol'), correct = +n.getAttribute('data-correct');
+    var opts = el('div', 'opts'), fb = el('div', 'fb'), btns = [];
+    [].forEach.call(ol.children, function (li, i) {
+      var b = el('button'); b.type = 'button'; b.innerHTML = li.innerHTML;
+      b.onclick = function () {
+        btns.forEach(function (x) { x.classList.remove('wrong'); });
+        if (i === correct) { b.classList.add('right'); fb.className = 'fb good'; fb.textContent = n.getAttribute('data-why'); markDone(t); }
+        else { b.classList.add('wrong'); fb.className = 'fb bad'; fb.textContent = 'To nie ta odpowiedź.'; }
+      };
+      btns.push(b); opts.appendChild(b);
+    });
+    ol.parentNode.replaceChild(opts, ol); n.appendChild(fb);
+    t.reset = function () { btns.forEach(function (x) { x.className = ''; }); fb.textContent = ''; };
+    if (state.done[t.id]) btns[correct].classList.add('right');
+  }
+
+  function buildCheck(t) {
+    var boxes = [].slice.call(t.node.querySelectorAll('input'));
+    var saved = state.done[t.id + ':boxes'] || [];
+    boxes.forEach(function (b, i) {
+      b.id = 'cb-' + t.id + '-' + i; b.checked = !!saved[i];
+      b.onchange = function () {
+        state.done[t.id + ':boxes'] = boxes.map(function (x) { return x.checked; });
+        var all = boxes.every(function (x) { return x.checked; });
+        if (all) markDone(t); else { delete state.done[t.id]; t.node.classList.remove('ok'); t.label.textContent = t.name; save(); refresh(); }
+      };
+    });
+    t.reset = function () { boxes.forEach(function (x) { x.checked = false; }); };
+  }
+
+  lessons.forEach(function (sec, li) {
+    var li_ = el('li'), b = el('button', null, sec.getAttribute('data-title'));
+    b.type = 'button'; b.onclick = function () { go(li, true); };
+    li_.appendChild(b); navList.appendChild(li_); sec.navBtn = b; sec.tasks = [];
+    [].forEach.call(sec.querySelectorAll('.task'), function (node, ti) {
+      var kind = node.getAttribute('data-kind');
+      var t = { id: sec.id + '-' + ti, node: node, kind: kind, name: kind === 'cmd' ? 'Wpisz polecenie' : kind === 'quiz' ? 'Pytanie' : 'Lista kroków' };
+      t.label = el('div', 'task-label', t.name);
+      node.insertBefore(t.label, node.firstChild);
+      if (kind === 'cmd') buildCmd(t); else if (kind === 'quiz') buildQuiz(t); else buildCheck(t);
+      if (state.done[t.id]) markDone(t, true);
+      sec.tasks.push(t); tasks.push(t);
+    });
+  });
+
+  [].forEach.call(document.querySelectorAll('.cmd'), function (c) {
+    var head = c.querySelector('.cmd-head');
+    if (!head) { head = el('div', 'cmd-head'); head.appendChild(el('span', null, 'terminal')); c.insertBefore(head, c.firstChild); }
+    var b = el('button', 'copy', 'Kopiuj'); b.type = 'button';
+    b.onclick = function () {
+      var code = c.querySelector('code');
+      var text = code.textContent.split('\n').map(function (l) { return l.replace(/\s+#\s.*$/, '').replace(/^#.*$/, ''); }).join('\n').trim();
+      function fallback() { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Zaznaczono'; }
+      try { navigator.clipboard.writeText(text).then(function () { b.textContent = 'Skopiowano'; }, fallback); } catch (e) { fallback(); }
+      setTimeout(function () { b.textContent = 'Kopiuj'; }, 1600);
+    };
+    head.appendChild(b);
+  });
+
+  function refresh() {
+    var done = tasks.filter(function (t) { return state.done[t.id]; }).length;
+    document.getElementById('prog-fill').style.width = (tasks.length ? done / tasks.length * 100 : 0) + '%';
+    document.getElementById('prog-txt').textContent = done + ' / ' + tasks.length + ' zadań';
+    lessons.forEach(function (sec) {
+      sec.navBtn.classList.toggle('done', sec.tasks.length > 0 && sec.tasks.every(function (t) { return state.done[t.id]; }));
+    });
+  }
+
+  function go(i, scroll) {
+    current = Math.max(0, Math.min(lessons.length - 1, i));
+    lessons.forEach(function (sec, k) {
+      sec.classList.toggle('on', k === current);
+      sec.navBtn.setAttribute('aria-current', k === current);
+    });
+    document.getElementById('prev').style.visibility = current === 0 ? 'hidden' : 'visible';
+    document.getElementById('next').style.visibility = current === lessons.length - 1 ? 'hidden' : 'visible';
+    nav.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false');
+    try { history.replaceState(null, '', '#' + lessons[current].id); } catch (e) {}
+    if (scroll) window.scrollTo(0, 0);
+  }
+  document.getElementById('prev').onclick = function () { go(current - 1, true); };
+  document.getElementById('next').onclick = function () { go(current + 1, true); };
+  menuBtn.onclick = function () { menuBtn.setAttribute('aria-expanded', nav.classList.toggle('open')); };
+
+  var rc = document.getElementById('reset-confirm'), rb = document.getElementById('reset-btn');
+  rb.onclick = function () { rc.hidden = false; rb.hidden = true; };
+  document.getElementById('reset-no').onclick = function () { rc.hidden = true; rb.hidden = false; };
+  document.getElementById('reset-yes').onclick = function () {
+    state.done = {}; save();
+    tasks.forEach(function (t) { t.node.classList.remove('ok'); t.label.textContent = t.name; t.reset(); });
+    rc.hidden = true; rb.hidden = false; refresh();
+  };
+
+  setOs(state.os);
+  refresh();
+  var start = 0, h = location.hash.slice(1);
+  lessons.forEach(function (sec, k) { if (sec.id === h) start = k; });
+  go(start, false);
+})();
+</script>
