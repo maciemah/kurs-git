@@ -39,6 +39,8 @@ a{color:var(--branch)}
 .prog{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .prog-track{width:110px;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden}
 .prog-fill{height:100%;width:0;background:var(--main);transition:width .3s}
+.theme-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:.9rem}
+.theme-btn:hover{border-color:var(--main)}
 .menu-btn{display:none;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 12px;cursor:pointer;font-size:.9rem}
 
 .wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:24px 64px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:40px;align-items:start}
@@ -119,6 +121,11 @@ td code{white-space:nowrap}
 }
 @media (prefers-reduced-motion:reduce){.prog-fill{transition:none}}
 </style>
+<script>
+/* motyw wybrany przełącznikiem; bez zapisanego wyboru strona jest ciemna */
+var m = null; try { m = localStorage.getItem('kursy-motyw'); } catch (e) {}
+document.documentElement.setAttribute('data-theme', m === 'light' ? 'light' : 'dark');
+</script>
 
 <header class="bar">
   <div class="bar-in">
@@ -128,6 +135,7 @@ td code{white-space:nowrap}
       <button type="button" id="os-mac" data-os="mac" aria-pressed="false">macOS</button>
     </div>
     <div class="prog" aria-live="polite"><div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div><span id="prog-txt">0 / 0</span></div>
+    <button type="button" class="theme-btn" id="theme-btn">☾ Ciemny motyw</button>
     <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false">Spis lekcji</button>
   </div>
 </header>
@@ -843,5 +851,18 @@ git switch -c ratunek a1b2c3d   <span class="c"># nowa gałąź w odnalezionym m
   var start = 0, h = location.hash.slice(1);
   lessons.forEach(function (sec, k) { if (sec.id === h) start = k; });
   go(start, false);
+
+  /* przełącznik motywu; wybór jest wspólny dla wszystkich kursów pod tym samym adresem */
+  var themeBtn = document.getElementById('theme-btn'), root = document.documentElement, mq = window.matchMedia('(prefers-color-scheme: dark)');
+  function isDark() { var t = root.getAttribute('data-theme'); return t ? t === 'dark' : mq.matches; }
+  function labelTheme() { themeBtn.textContent = isDark() ? '☀ Jasny motyw' : '☾ Ciemny motyw'; }
+  themeBtn.onclick = function () {
+    var m = isDark() ? 'light' : 'dark';
+    root.setAttribute('data-theme', m);
+    try { localStorage.setItem('kursy-motyw', m); } catch (e) {}
+    labelTheme();
+  };
+  if (mq.addEventListener) mq.addEventListener('change', labelTheme);
+  labelTheme();
 })();
 </script>
