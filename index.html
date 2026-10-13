@@ -233,9 +233,16 @@ git config --global init.defaultBranch main</code></pre></div>
   <p>W lekcji o dwóch komputerach dodasz jeszcze plik <code>.gitattributes</code>, który ustala to samo wewnątrz repozytorium, niezależnie od ustawień komputera.</p>
 
   <h2>Edytor</h2>
-  <p>Git czasem otwiera edytor, np. gdy pominiesz opis commita. Ustaw taki, z którego umiesz wyjść:</p>
+  <p>Git czasem otwiera edytor, np. gdy pominiesz opis commita. Najpierw sprawdź, którego użyje teraz:</p>
+  <div class="cmd"><pre><code>git var GIT_EDITOR</code></pre></div>
+  <p>To polecenie pokazuje edytor, który Git faktycznie uruchomi. Samo ustawienie z konfiguracji zobaczysz tak:</p>
+  <div class="cmd"><pre><code>git config --get core.editor</code></pre></div>
+  <p>Puste wyjście oznacza, że edytor nie jest ustawiony w konfiguracji. Git bierze go wtedy kolejno ze zmiennych środowiskowych <code>GIT_EDITOR</code>, <code>VISUAL</code>, <code>EDITOR</code>, a na końcu używa <code>vi</code>. Ustaw taki, z którego umiesz wyjść, np. Visual Studio Code:</p>
   <div class="cmd"><pre><code>git config --global core.editor "code --wait"</code></pre></div>
-  <p class="os-mac">Polecenie <code>code</code> musi być dostępne w terminalu. W VS Code otwórz paletę (<code>⌘⇧P</code>) i wybierz „Shell Command: Install 'code' command in PATH”.</p>
+  <p>Opcja <code>--wait</code> jest konieczna: Git czeka dzięki niej, aż zamkniesz kartę z plikiem w VS Code, i dopiero wtedy kończy np. commit.</p>
+  <p>Polecenie <code>code</code> musi być dostępne w terminalu. Sprawdzisz to poleceniem <code>code --version</code>.</p>
+  <p class="os-win">Jeśli terminal nie zna polecenia <code>code</code>, uruchom ponownie instalator VS Code, zaznacz „Dodaj do PATH” i otwórz terminal od nowa.</p>
+  <p class="os-mac">Jeśli terminal nie zna polecenia <code>code</code>, w VS Code otwórz paletę (<code>⌘⇧P</code>) i wybierz „Shell Command: Install 'code' command in PATH”.</p>
 
   <h2>Sprawdzenie</h2>
   <div class="cmd"><pre><code>git config --global --list</code></pre></div>
