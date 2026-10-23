@@ -103,6 +103,7 @@ td code{white-space:nowrap}
 .prompt .in:focus-within{outline:2px solid var(--branch);outline-offset:2px}
 .btn{border:1px solid var(--main);background:var(--main);color:var(--surface);border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);font-weight:500}
+.mark-row{display:flex;justify-content:flex-end;margin-top:20px}
 .fb{font-size:.9rem;min-height:1.3em}
 .fb.good{color:var(--main)} .fb.bad{color:var(--bad)}
 .opts{display:flex;flex-direction:column;gap:6px}
@@ -804,6 +805,12 @@ git switch -c ratunek a1b2c3d   <span class="c"># nowa gałąź w odnalezionym m
       if (state.done[t.id]) markDone(t, true);
       sec.tasks.push(t); tasks.push(t);
     });
+    /* ręczne oznaczenie lekcji; znacznik leży w state.done pod id lekcji */
+    if (sec.id === 'start' || sec.id === 'sciaga') return;
+    var row = el('div', 'mark-row'), mb = el('button', 'btn ghost oznacz', 'Oznacz jako przerobione');
+    mb.type = 'button';
+    mb.onclick = function () { if (state.done[sec.id]) delete state.done[sec.id]; else state.done[sec.id] = true; save(); refresh(); };
+    row.appendChild(mb); sec.appendChild(row); sec.markBtn = mb;
   });
 
   [].forEach.call(document.querySelectorAll('.cmd'), function (c) {
@@ -825,7 +832,8 @@ git switch -c ratunek a1b2c3d   <span class="c"># nowa gałąź w odnalezionym m
     document.getElementById('prog-fill').style.width = (tasks.length ? done / tasks.length * 100 : 0) + '%';
     document.getElementById('prog-txt').textContent = done + ' / ' + tasks.length + ' zadań';
     lessons.forEach(function (sec) {
-      sec.navBtn.classList.toggle('done', sec.tasks.length > 0 && sec.tasks.every(function (t) { return state.done[t.id]; }));
+      sec.navBtn.classList.toggle('done', !!state.done[sec.id] || (sec.tasks.length > 0 && sec.tasks.every(function (t) { return state.done[t.id]; })));
+      if (sec.markBtn) sec.markBtn.textContent = state.done[sec.id] ? 'Cofnij oznaczenie' : 'Oznacz jako przerobione';
     });
   }
 
