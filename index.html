@@ -157,7 +157,7 @@ document.documentElement.setAttribute('data-theme', m === 'light' ? 'light' : 'd
   <div class="eyebrow">Zanim zaczniesz</div>
   <h1>Git od zera, na Windowsie i na Macu</h1>
   <p class="lead">Git zapamiętuje kolejne wersje Twoich plików. Możesz wrócić do dowolnej z nich, pracować nad kilkoma pomysłami naraz i mieć ten sam projekt na kilku komputerach.</p>
-  <p>Kurs prowadzi od instalacji do swobodnej pracy z GitHubem na dwóch maszynach. Polecenia Gita są takie same w obu systemach. Różni się instalacja, logowanie do GitHuba, schowek i kilka ustawień. W tych miejscach kurs pokazuje wersję dla systemu wybranego w górnym pasku.</p>
+  <p>Kurs prowadzi od instalacji do swobodnej pracy z GitHubem na dwóch maszynach. Polecenia Gita są takie same w obu systemach. Różni się instalacja, logowanie do GitHuba, schowek i kilka ustawień. W tych miejscach kurs pokazuje wersję dla systemu wybranego w górnym pasku. Lekcje 11 i 12 pokazują Gita w Visual Studio Code i na egzaminie INF.04.</p>
   <h2>Jak korzystać</h2>
   <ul>
     <li>Wybierz system u góry. Wybór możesz zmienić w każdej chwili, np. gdy przesiadasz się na drugi komputer.</li>
@@ -623,6 +623,130 @@ git switch -c ratunek a1b2c3d   <span class="c"># nowa gałąź w odnalezionym m
   </div>
 </section>
 
+<section class="lesson" id="vscode" data-title="Git i GitHub w VS Code">
+  <div class="eyebrow">Lekcja 11</div>
+  <h1>Git i GitHub w VS Code</h1>
+  <p class="lead">Visual Studio Code ma wbudowany panel Gita. Pod spodem działa ten sam Git co w terminalu, więc oba sposoby możesz mieszać: commit zrobiony w panelu od razu widać w <code>git log</code>, a polecenie wpisane w terminalu od razu zmienia panel.</p>
+  <p>VS Code nie instaluje Gita. Jeśli w terminalu nie działa <code>git --version</code>, wróć do lekcji 1. Nazwy przycisków w tej lekcji pochodzą z angielskiej wersji VS Code. W polskiej wersji przyciski są w tych samych miejscach, tylko z przetłumaczonymi podpisami.</p>
+  <h2>Panel Source Control</h2>
+  <p>Otwórz folder projektu (File → Open Folder). Panel Gita otwiera ikona rozgałęzienia na pasku po lewej albo skrót z tabeli.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Co</th><th>Windows</th><th>macOS</th></tr></thead>
+    <tbody>
+      <tr><td>Panel Source Control</td><td><code>Ctrl+Shift+G</code></td><td><code>⌃⇧G</code></td></tr>
+      <tr><td>Commit z pola opisu</td><td><code>Ctrl+Enter</code></td><td><code>⌘Enter</code></td></tr>
+      <tr><td>Terminal w VS Code</td><td><code>Ctrl+`</code></td><td><code>⌃`</code></td></tr>
+      <tr><td>Paleta poleceń</td><td><code>Ctrl+Shift+P</code></td><td><code>⌘⇧P</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>Jeśli folder nie jest jeszcze repozytorium, panel pokazuje przycisk <b>Initialize Repository</b>. Działa jak <code>git init</code>.</p>
+  <h2>Commit bez terminala</h2>
+  <div class="flow">
+    <div class="box"><b>Changes</b><span>zmienione pliki</span></div>
+    <div class="arr">plus przy pliku<br>→</div>
+    <div class="box"><b>Staged Changes</b><span>poczekalnia</span></div>
+    <div class="arr">Commit<br>→</div>
+    <div class="box"><b>Historia</b><span>zapisany commit</span></div>
+  </div>
+  <ol>
+    <li>Na liście <b>Changes</b> są zmienione pliki. Litera obok nazwy mówi, co się stało: <b>M</b> plik zmieniony, <b>U</b> nowy i jeszcze nieśledzony, <b>D</b> usunięty.</li>
+    <li>Kliknięcie pliku otwiera porównanie: po lewej wersja z ostatniego commita, po prawej obecna. To ten sam wynik co <code>git diff</code>.</li>
+    <li>Plus przy pliku przenosi go do <b>Staged Changes</b>, czyli do poczekalni, jak <code>git add</code>. Minus wyjmuje go z powrotem.</li>
+    <li>Wpisz opis w polu nad listą i kliknij <b>Commit</b> albo naciśnij <code class="os-win">Ctrl+Enter</code><code class="os-mac">⌘Enter</code>.</li>
+  </ol>
+  <p>Gdy poczekalnia jest pusta, VS Code zapyta, czy zapisać od razu wszystkie zmiany. To wygodne, ale do commita trafiają wtedy także pliki, których nie oglądałeś.</p>
+  <p>W edytorze, obok numerów wierszy, widać kolorowe paski: zielony to nowe wiersze, niebieski zmienione, a czerwony trójkąt miejsce, z którego wiersze usunięto. Kliknięcie paska pokazuje, co było wcześniej.</p>
+  <div class="note"><b>Ostrożnie z zakręconą strzałką przy pliku (Discard Changes).</b> Wyrzuca niezapisane zmiany w pliku, tak jak <code>git restore</code>. VS Code pyta o potwierdzenie, ale po zgodzie zmian już nie odzyskasz.</div>
+  <p>Pliku, którego Git ma nie śledzić, nie musisz wpisywać ręcznie: kliknij go prawym przyciskiem na liście <b>Changes</b> i wybierz <b>Add to .gitignore</b>.</p>
+  <h2>Historia i gałęzie</h2>
+  <p>Na dole panelu Source Control jest wykres historii (<b>Source Control Graph</b>, w nowszych wersjach po prostu <b>Graph</b>). Pokazuje commity i gałęzie jak <code>git log --oneline --graph</code>. Historię jednego pliku pokazuje sekcja <b>Timeline</b> na dole panelu Explorer.</p>
+  <p>Nazwa bieżącej gałęzi jest w lewym dolnym rogu okna, na pasku stanu. Kliknięcie otwiera listę: wybierz gałąź, żeby się na nią przełączyć (<code>git switch</code>), albo <b>Create new branch…</b>, żeby utworzyć nową (<code>git switch -c</code>). Do scalenia otwórz paletę poleceń, wpisz „merge” i wybierz polecenie Gita do scalania gałęzi.</p>
+  <h2>GitHub</h2>
+  <p>Repozytorium bez zdalnej kopii ma w panelu przycisk <b>Publish Branch</b>. Folder, który nie jest jeszcze repozytorium, ma przycisk <b>Publish to GitHub</b>. VS Code zapyta o nazwę i o to, czy repozytorium ma być prywatne (private), czy publiczne (public). Potem utworzy je na GitHubie i wyśle gałąź, czyli zrobi za Ciebie <code>git remote add origin</code> i <code>git push -u origin main</code>.</p>
+  <p>Przy pierwszym połączeniu z GitHubem VS Code poprosi o zgodę na zalogowanie. Kliknij <b>Allow</b>, a przeglądarka otworzy stronę GitHuba z prośbą o potwierdzenie. Później VS Code wysyła i pobiera bez pytania, a konto widać pod ikoną konta w lewym dolnym rogu.</p>
+  <p>Pobranie repozytorium z GitHuba: paleta poleceń → <b>Git: Clone</b> → <b>Clone from GitHub</b>, potem wybierz repozytorium i folder. Na koniec VS Code zaproponuje otwarcie pobranego projektu.</p>
+  <p>Obok nazwy gałęzi na pasku stanu jest przycisk synchronizacji z liczbami, np. <b>1↓ 2↑</b>: jeden commit do pobrania i dwa do wysłania. Kliknięcie robi <code>git pull</code>, a potem <code>git push</code>. Pojedyncze polecenia (Pull, Push, Fetch) są w menu <b>…</b> u góry panelu Source Control.</p>
+  <h2>Konflikty</h2>
+  <p>Pliki z konfliktem trafiają do osobnej grupy <b>Merge Changes</b>. Nad każdym miejscem konfliktu VS Code wyświetla odnośniki: <b>Accept Current Change</b> zostawia Twoją wersję, <b>Accept Incoming Change</b> wersję z drugiej gałęzi, a <b>Accept Both Changes</b> obie, jedna pod drugą. Przycisk <b>Resolve in Merge Editor</b> otwiera widok z obiema wersjami u góry i wynikiem na dole.</p>
+  <p>Po rozwiązaniu dodaj plik plusem do poczekalni i zrób commit. To te same kroki co <code>git add</code> i <code>git commit</code> z lekcji 7.</p>
+  <div class="task" data-kind="quiz" data-correct="1" data-why="Plus przenosi plik z Changes do Staged Changes, czyli do poczekalni. Zapis do historii robi dopiero przycisk Commit.">
+    <p>Któremu poleceniu odpowiada plus przy pliku w panelu Source Control?</p>
+    <ol><li><code>git commit</code></li><li><code>git add</code></li><li><code>git push</code></li></ol>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="0" data-why="Strzałka w dół to commity do pobrania, strzałka w górę commity do wysłania. Synchronizacja robi pull, a potem push.">
+    <p>Na pasku stanu przy gałęzi widać <b>1↓ 2↑</b>. Co zrobi kliknięcie?</p>
+    <ol><li>Pobierze jeden commit z GitHuba i wyśle dwa swoje</li><li>Cofnie jeden commit i doda dwa nowe</li><li>Przełączy na drugą gałąź</li></ol>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="2" data-why="Panel VS Code tylko wywołuje Gita zainstalowanego w systemie. Historia jest jedna: w folderze .git projektu.">
+    <p>Zrobiłeś commit w panelu VS Code. Co pokaże <code>git log</code> w terminalu?</p>
+    <ol><li>Nic, VS Code prowadzi osobną historię</li><li>Ten commit, ale dopiero po <code>git push</code></li><li>Ten commit od razu, bo to ten sam Git</li></ol>
+  </div>
+</section>
+
+<section class="lesson" id="inf04" data-title="Git na egzaminie INF.04">
+  <div class="eyebrow">Lekcja 12</div>
+  <h1>Git na egzaminie INF.04</h1>
+  <p class="lead">W arkuszu INF.04 ze stycznia 2026 (zadanie 02) Git jest częścią zadania: kod aplikacji mobilnej trzeba zapisywać w repozytorium, a historię pokazać na zrzutach ekranu. Wśród 21 arkuszy INF.04 z lat 2021–2026 dostępnych w serwisie zawodowe.edu.pl to jedyny taki arkusz, ale wymaganie może wrócić.</p>
+  <h2>Co każe arkusz</h2>
+  <ul>
+    <li>Po przygotowaniu projektu aplikacji założyć w nim lokalne repozytorium Git.</li>
+    <li>Skonfigurować repozytorium: nazwą użytkownika ma być numer zdającego, a e-mailem <code>egzamin@poczta.pl</code>.</li>
+    <li>Zapisać co najmniej dwie wersje: po zbudowaniu widoku aplikacji i po zaprogramowaniu jej działania. Opisy commitów mają być znaczące.</li>
+    <li>W dokumentacji pokazać wszystkie zapisane wersje z opisami oraz konfigurację użytkownika (nazwę i e-mail). Można użyć poleceń Gita albo narzędzi środowiska programistycznego. Zrzuty ekranu nazywasz <code>git1.png</code>, <code>git2.png</code> itd. i zapisujesz w folderze <code>dokumentacja</code>.</li>
+  </ul>
+  <p>Klucz oceniania ma za Gita dwa osobne kryteria: repozytorium skonfigurowane z nazwą i e-mailem oraz co najmniej dwa zapisy wersji. Każde z nich musi być udokumentowane zrzutem ekranu. Do arkusza był dołączony wyciąg z dokumentacji Gita z poleceniami <code>config</code>, <code>help</code>, <code>init</code>, <code>add</code>, <code>status</code>, <code>diff</code>, <code>commit</code> i <code>log</code>, więc na egzaminie możesz je podejrzeć.</p>
+  <h2>Krok po kroku</h2>
+  <p>Najpewniej zrobisz to w terminalu, w folderze projektu. W Android Studio terminal otwiera zakładka <b>Terminal</b> na dole okna (<code>Alt+F12</code>), w VS Code skrót <code>Ctrl+`</code>. Oba terminale startują w folderze otwartego projektu.</p>
+  <div class="cmd"><pre><code>git init                                     <span class="c"># 1. repozytorium po utworzeniu projektu</span>
+git config user.name "01234567890"           <span class="c"># 2. numer zdającego</span>
+git config user.email "egzamin@poczta.pl"
+git status                                   <span class="c"># co wejdzie do repozytorium</span>
+
+git add .                                    <span class="c"># 3. po zbudowaniu widoku</span>
+git commit -m "Widok quizu: obraz, pytanie, odpowiedzi i przycisk"
+
+git add .                                    <span class="c"># 4. po zaprogramowaniu działania</span>
+git commit -m "Działanie quizu: sprawdzanie odpowiedzi i kolejne pytania"</code></pre></div>
+  <p><b>Bez <code>--global</code>.</b> Arkusz każe skonfigurować repozytorium, więc nazwę i e-mail ustawiasz tylko w nim. Trafiają do pliku <code>.git/config</code> projektu i nie zmieniają ustawień całego stanowiska egzaminacyjnego.</p>
+  <p><b>Najpierw konfiguracja, potem commit.</b> Bez niej Git odmówi zapisu z komunikatem „Author identity unknown” albo, co gorsze, podpisze commit danymi, które ktoś zostawił w ustawieniach komputera.</p>
+  <p><b>Właściwy folder.</b> <code>git init</code> wpisujesz w głównym folderze projektu, tym z plikiem <code>settings.gradle</code> albo <code>settings.gradle.kts</code>. Nowy projekt w Android Studio ma już pliki <code>.gitignore</code>, więc foldery <code>build</code> i ustawienia środowiska nie trafią do repozytorium. Przed pierwszym commitem sprawdź to w <code>git status</code>.</p>
+  <p><b>Znaczący opis</b> mówi, co zrobiono na danym etapie. „Widok quizu: obraz, pytanie, odpowiedzi i przycisk” spełnia wymaganie. Opisy w rodzaju „zmiany”, „commit 1” albo „aaa” go nie spełniają.</p>
+  <p><b>Zapisuj na bieżąco.</b> Arkusz przypomina o zapisie dopiskami „UWAGA” po opisie widoku i po opisie działania aplikacji. Commit zrób od razu po skończeniu etapu, nie na koniec egzaminu: <code>git log</code> pokazuje godzinę każdego zapisu.</p>
+  <h2>Zrzut ekranu do dokumentacji</h2>
+  <div class="cmd"><pre><code>git log
+git config user.name
+git config user.email</code></pre></div>
+  <p><code>git log</code> wypisuje każdy commit z opisem, autorem (nazwą i e-mailem) i datą, a dwa kolejne polecenia pokazują konfigurację repozytorium. <code>git log --oneline</code> tu nie wystarczy, bo pomija autora. Gdy historia nie mieści się w oknie, <code>git log</code> pokazuje ją stronami; wyjdziesz klawiszem <code>q</code>.</p>
+  <p>Zrób zrzut całego ekranu z terminalem i wynikami. Na Windowsie <code>Win+PrtSc</code> zapisuje go w folderze Obrazy\Zrzuty ekranu. Skopiuj plik do folderu <code>dokumentacja</code> jako <code>git1.png</code>. Jeśli wszystko nie mieści się na jednym zrzucie, zrób kolejne: <code>git2.png</code>, <code>git3.png</code>.</p>
+  <h2>Bez terminala: Git w Android Studio</h2>
+  <p>Arkusz dopuszcza też narzędzia wbudowane w środowisko. W Android Studio:</p>
+  <ul>
+    <li>Repozytorium: menu <b>VCS → Create Git Repository…</b> (w starszych wersjach <b>VCS → Enable Version Control Integration…</b> i wybór Git).</li>
+    <li>Commit: <b>Git → Commit…</b> (<code>Ctrl+K</code>). Zaznacz pliki, także te z grupy <b>Unversioned Files</b>, wpisz opis i kliknij <b>Commit</b>.</li>
+    <li>Gdy nazwa i e-mail nie są ustawione, Android Studio zapyta o nie przy pierwszym commicie. Odznacz wtedy <b>Set properties globally</b>, żeby ustawić je tylko w tym repozytorium.</li>
+    <li>Historia: okno <b>Git</b> (<code>Alt+9</code>), zakładka <b>Log</b>, z opisem, autorem i datą każdego commita.</li>
+  </ul>
+  <p>Nazwy menu różnią się trochę między wersjami Android Studio, a terminal działa zawsze tak samo. Dlatego konfigurację do zrzutu najprościej i tak wypisać w terminalu. W VS Code te same kroki zrobisz panelem z lekcji 11.</p>
+  <div class="note"><b>Nie usuwaj folderu <code>.git</code>.</b> Repozytorium to ukryty folder <code>.git</code> w projekcie. Zostaw go w projekcie, który pakujesz do archiwum na płytę: to w nim jest historia. W Eksploratorze Windows ukryte foldery pokazuje Widok → Pokaż → Ukryte elementy.</div>
+  <div class="task" data-kind="cmd" data-ok="^git config (--local )?user\.name &quot;?01234567890&quot;?$" data-ans="git config user.name &quot;01234567890&quot;" data-hint="Bez --global: ustawienie ma dotyczyć tylko tego repozytorium.">
+    <p>Jesteś w folderze projektu. Ustaw tylko w tym repozytorium nazwę użytkownika równą numerowi zdającego <code>01234567890</code>.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git config (--local )?user\.email &quot;?egzamin@poczta\.pl&quot;?$" data-ans="git config user.email &quot;egzamin@poczta.pl&quot;" data-hint="Tak samo jak nazwę, tylko klucz to user.email.">
+    <p>Ustaw w tym repozytorium e-mail z arkusza: <code>egzamin@poczta.pl</code>.</p>
+  </div>
+  <div class="task" data-kind="cmd" data-ok="^git log$" data-ans="git log" data-hint="Bez opcji: --oneline pomija autora commita.">
+    <p>Wypisz wszystkie zapisane wersje z opisami, autorem i datą, żeby zrobić zrzut <code>git1.png</code>.</p>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="1" data-why="Opcja --global zapisuje ustawienie dla wszystkich repozytoriów na komputerze. Arkusz każe skonfigurować repozytorium, więc wystarczy git config bez tej opcji.">
+    <p>Dlaczego na egzaminie lepiej ustawić nazwę i e-mail bez <code>--global</code>?</p>
+    <ol><li>Bez <code>--global</code> commit jest szybszy</li><li>Arkusz każe skonfigurować repozytorium, a <code>--global</code> zmienia ustawienia całego stanowiska</li><li><code>--global</code> nie działa w terminalu Android Studio</li></ol>
+  </div>
+  <div class="task" data-kind="quiz" data-correct="2" data-why="Znaczący opis mówi, co zrobiono na danym etapie. Same numery i ogólniki nic nie mówią o zmianie.">
+    <p>Który opis drugiego commita spełnia wymaganie z arkusza?</p>
+    <ol><li><code>poprawki</code></li><li><code>commit 2</code></li><li><code>Działanie quizu: sprawdzanie odpowiedzi i kolejne pytania</code></li></ol>
+  </div>
+</section>
+
 <section class="lesson" id="projekt" data-title="Projekt końcowy">
   <div class="eyebrow">Praktyka</div>
   <h1>Projekt końcowy</h1>
@@ -675,6 +799,20 @@ git switch -c ratunek a1b2c3d   <span class="c"># nowa gałąź w odnalezionym m
     <tr><td><code>git reset --soft HEAD~1</code></td><td>cofnij ostatni commit, zachowaj zmiany</td></tr>
     <tr><td><code>git stash</code> / <code>git stash pop</code></td><td>odłóż zmiany / przywróć</td></tr>
     <tr><td><code>git reflog</code></td><td>historia położeń gałęzi</td></tr>
+  </tbody></table></div>
+  <h2>Egzamin INF.04</h2>
+  <div class="tbl"><table><tbody>
+    <tr><td><code>git config user.name "numer"</code></td><td>nazwa tylko w tym repozytorium: numer zdającego</td></tr>
+    <tr><td><code>git config user.email "egzamin@poczta.pl"</code></td><td>e-mail z arkusza</td></tr>
+    <tr><td><code>git add .</code>, potem <code>git commit -m "Opis etapu"</code></td><td>zapis po widoku i po działaniu aplikacji</td></tr>
+    <tr><td><code>git log</code></td><td>historia z autorem i datą do zrzutu <code>git1.png</code></td></tr>
+  </tbody></table></div>
+  <h2>VS Code</h2>
+  <div class="tbl"><table><tbody>
+    <tr><td>plus przy pliku, potem Commit</td><td><code>git add</code>, potem <code>git commit</code></td></tr>
+    <tr><td>przycisk synchronizacji przy gałęzi</td><td><code>git pull</code>, potem <code>git push</code></td></tr>
+    <tr><td>Publish Branch</td><td>nowe repozytorium na GitHubie i pierwszy <code>push</code></td></tr>
+    <tr><td>Git: Clone → Clone from GitHub</td><td><code>git clone</code></td></tr>
   </tbody></table></div>
   <h2>Różnice między systemami</h2>
   <div class="tbl"><table>
